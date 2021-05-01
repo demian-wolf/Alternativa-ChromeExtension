@@ -1,0 +1,39 @@
+*, *:focus, *:hover {
+    outline: none;
+}
+
+body {
+    padding: 10px;
+    background: #008FD3;
+    min-width: 200px;
+    min-height: 300px;
+    color: white;
+}
+
+#about p{
+    text-align: center;
+}
+
+#about #school-logo {
+    height: 60px;
+    width: 60px;
+}
+
+#switch {
+    text-align: center;
+}
+
+#switch button {
+    background-color: #008FD3;
+    color: white;
+    padding: 20px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 16px;
+    margin: 4px 2px;
+    border-radius: 100px;
+}
+
+#switch button:hover {
+    background: red;
+}
