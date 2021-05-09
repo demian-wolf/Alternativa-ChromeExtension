@@ -10,7 +10,13 @@
     "content_scripts": [
         {
             "matches": ["https://online-shkola.com.ua/*"],
-            "js": ["js/extend_menubar.js"]
+            "js": ["js/extend_menubar.js"],
+            "run_at": "document_end"
+        },
+        {
+            "matches": ["https://online-shkola.com.ua/schedule/diary.php"],
+            "js": ["js/fix_diary.js"],
+            "run_at": "document_end"
         }
     ]
 }

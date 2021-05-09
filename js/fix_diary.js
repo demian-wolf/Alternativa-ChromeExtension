@@ -3,10 +3,17 @@ function get_current_language() {
 }
 
 function get_current_date() {
+    function padStart(string, length, filler) {  // polyfill for older browsers
+        while (string.length < length) {
+            string = filler + string;
+        }
+        return string;
+    }
+    
     // source: https://stackoverflow.com/a/4929629/8661764
     var today = new Date();
-    var dd = String(today.getDate()).padStart(2, '0');
-    var mm = String(today.getMonth() + 1).padStart(2, '0');
+    var dd = padStart(String(today.getDate()), 2, '0');
+    var mm = padStart(String(today.getMonth() + 1), 2, '0');
     var yyyy = today.getFullYear();
     
     date = `${yyyy}-${mm}-${dd}`;
@@ -18,22 +25,16 @@ function get_student_form() {
     return 9;
 }
 
-function fix_diary(data, is_json, fixer) {
-    var req = new XMLHttpRequest();
-    
-    req.open("POST", "https://online-shkola.com.ua/schedule/diary/index.php", true);
-    
-    if (is_json) {
-        req.responseType = "json"
-    }
-    
-    req.send(JSON.stringify(data));
-    
-    req.onreadystatechange = function() {
-        if (req.readyState == 4 && req.status == 200) {
-            fixer(req);
-        }
-    }
+function fix_diary(data, fixer) {
+    const response = fetch("https://online-shkola.com.ua/schedule/diary/index.php", {
+            method: "POST",
+            mode: "same-origin",
+            headers: {"Referer": "https://www.online-shkola.com.ua/schedule/diary.php"},
+            body: JSON.stringify(data)
+        }).then((response) => {
+            console.log(response);
+            fixer(response);
+        });
 }
 
 function fix_diarystats() {
@@ -44,9 +45,10 @@ function fix_diarystats() {
             "class_n": get_student_form().toString(),
             "subject_v": "0"};
     
-    fix_diary(data, true, function(req) {
+    fix_diary(data, function(response) {
             prg_elements = document.getElementsByClassName("progress-background");
-            stats = [req.response.hw, req.response.test]
+            json = response.json();
+            stats = [json.hw, json.response.test]
             console.log(stats);
             for (var type=0; type < 2; type++) {
                 let done = stats[type].done;
@@ -66,7 +68,7 @@ function fix_diarystats() {
         })
 }
 
-function fix_diarytable(req) {
+function fix_diarytable() {
     // TODO: make it possible to filter subjects and dates (change "date" and "subject_v")
     data = {"type": "table",
             "date": get_current_date(),
@@ -76,8 +78,8 @@ function fix_diarytable(req) {
             "class_n": get_student_form().toString(),
             "subject_v": "0"};
     
-    fix_diary(data, false, function(req) {
-        document.getElementById("diary-week").innerHTML = req.responseText;
+    fix_diary(data, function(response) {
+        document.getElementById("diary-week").innerHTML = response.text();
         }
     )
 }
